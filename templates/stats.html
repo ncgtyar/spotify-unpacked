@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Stats Unpacked</title>
+    <style>
+        :root {
+            --spotify-green: #1DB954;
+            --bg-gray: #f8f9fa;
+            --text-gray: #bbb;
+            --rank-gray: #999;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-gray);
+            color: #121212;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .nav-menu {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            font-size: 1.1rem;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .nav-active {
+            color: var(--spotify-green) !important;
+            font-weight: 700 !important;
+            font-size: 1.45rem !important;
+        }
+
+        .now-playing-container {
+            position: absolute;
+            top: 60px; 
+            right: 60px; 
+            background: var(--spotify-green);
+            color: white;
+            padding: 14px 22px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 12px 30px rgba(29, 185, 84, 0.25);
+            max-width: 600px; 
+            width: fit-content;
+            z-index: 1000;
+            transform: scale(0.99);
+            transform-origin: top right;
+        }
+
+        .now-playing-img { width: 56px; height: 56px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.15); }
+        .now-playing-info { min-width: 0; flex-grow: 1; }
+        .now-playing-song { font-size: 1.15rem; font-weight: 800; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .now-playing-artist { font-size: 0.9rem; opacity: 0.9; display: block; }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .header-section {
+            margin-top: 40px; 
+            margin-bottom: 15px;
+        }
+
+        h1 { 
+            margin: 0; 
+            font-weight: 900; 
+            font-size: 3.3rem; 
+            letter-spacing: -1px; 
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px auto 25px auto;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #eee;
+            border: 1px solid #ddd;
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #121212;
+        }
+
+        .toggler-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 50px;
+        }
+
+        .toggler {
+            display: flex;
+            background: #e9ecef;
+            border-radius: 20px;
+            padding: 4px;
+        }
+
+        .toggler a {
+            text-decoration: none;
+            color: #555;
+            padding: 8px 24px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .toggler a.active {
+            background: var(--spotify-green);
+            color: white;
+            box-shadow: 0 4px 10px rgba(29, 185, 84, 0.2);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 45px;
+            text-align: left;
+        }
+
+        .column-header {
+            font-size: 1.55rem; 
+            font-weight: 800;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f2f2f2;
+        }
+
+        .rank { width: 45px; font-weight: 800; color: var(--rank-gray); flex-shrink: 0; font-size: 1rem; }
+        .rank-1 { color: #D4AF37; font-size: 1.5rem !important; } 
+        .rank-2 { color: #C0C0C0; font-size: 1.333rem !important; } 
+        .rank-3 { color: #CD7F32; font-size: 1.167rem !important; } 
+
+        .item-img { width: 52px; height: 52px; margin: 0 14px; object-fit: cover; flex-shrink: 0; }
+        .artist-img { border-radius: 50%; }
+        .rect-img { border-radius: 6px; }
+
+        .text-info { flex-grow: 1; min-width: 0; word-break: break-word; }
+        .name { font-weight: 700; font-size: 1.15rem; margin-bottom: 2px; line-height: 1.2; }
+        .subtext { color: #777; font-size: 0.95rem; }
+
+        .equalizer { display: flex; align-items: flex-end; gap: 4px; width: 22px; height: 22px; flex-shrink: 0; }
+        .eq-bar { background: white; width: 4px; animation: eq 0.8s ease-in-out infinite alternate; }
+        .eq-bar:nth-child(2) { animation-duration: 0.5s; height: 60%; }
+        .eq-bar:nth-child(3) { animation-duration: 0.7s; height: 40%; }
+        @keyframes eq { 0% { height: 25%; } 100% { height: 100%; } }
+
+        @media (max-width: 1100px) {
+            .dashboard { grid-template-columns: 1fr; margin-top: 30px; }
+            .now-playing-container { position: relative; right: auto; top: auto; margin: 20px auto; transform: none; max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-menu">
+        <a href="/">Home</a>
+        <a href="/login" class="nav-active">My Stats</a>
+    </nav>
+
+    {% if now_playing %}
+    <div class="now-playing-container">
+        <img src="{{ now_playing.image }}" class="now-playing-img">
+        <div class="now-playing-info">
+            <span class="now-playing-song">{{ now_playing.name }}</span>
+            <span class="now-playing-artist">{{ now_playing.artist }}</span>
+        </div>
+        <div class="equalizer"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
+    </div>
+    {% endif %}
+
+    <div class="main-container">
+        <div class="header-section">
+            <h1>Your Unpacked</h1>
+        </div>
+
+        <div class="user-profile">
+            {% if user.image %}
+                <img src="{{ user.image }}" class="user-avatar">
+            {% else %}
+                <div class="user-avatar" style="display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; background: #eee; color: #bbb;">?</div>
+            {% endif %}
+            <span class="user-name">{{ user.name }}</span>
+        </div>
+
+        <div class="toggler-container">
+            <div class="toggler">
+                <a href="/stats?term=short_term" class="{% if current_term == 'short_term' %}active{% endif %}">4 Weeks</a>
+                <a href="/stats?term=medium_term" class="{% if current_term == 'medium_term' %}active{% endif %}">6 Months</a>
+                <a href="/stats?term=long_term" class="{% if current_term == 'long_term' %}active{% endif %}">All Time</a>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="column">
+                <div class="column-header">Top Artists</div>
+                {% for item in artists %}
+                <div class="list-item">
+                    <div class="rank {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% endif %}">{{ loop.index }}</div>
+                    <img src="{{ item.image }}" class="item-img artist-img">
+                    <div class="text-info"><div class="name">{{ item.name }}</div></div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="column">
+                <div class="column-header">Top Albums</div>
+                {% for item in albums %}
+                <div class="list-item">
+                    <div class="rank {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% endif %}">{{ loop.index }}</div>
+                    <img src="{{ item.image }}" class="item-img rect-img">
+                    <div class="text-info"><div class="name">{{ item.name }}</div><div class="subtext">{{ item.info }}</div></div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="column">
+                <div class="column-header">Top Songs</div>
+                {% for item in tracks %}
+                <div class="list-item">
+                    <div class="rank {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% endif %}">{{ loop.index }}</div>
+                    <img src="{{ item.image }}" class="item-img rect-img">
+                    <div class="text-info"><div class="name">{{ item.name }}</div><div class="subtext">{{ item.info }}</div></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

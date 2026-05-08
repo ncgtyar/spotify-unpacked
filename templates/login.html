@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting to Spotify</title>
+    <meta http-equiv="refresh" content="1.5;url={{ auth_url }}">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .card {
+            text-align: center;
+            background: #181818;
+            padding: 2.5rem;
+            border-radius: 18px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+            max-width: 340px;
+            width: 85%;
+            border: 1px solid #282828;
+        }
+        .loader {
+            border: 3px solid #333;
+            border-top: 3px solid #1DB954;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        h2 { font-weight: 600; margin-bottom: 8px; font-size: 1.4rem; }
+
+        p { color: #b3b3b3; font-size: 0.95rem; line-height: 1.4; margin-bottom: 20px; }
+        
+        .fallback { 
+            font-size: 0.8rem; 
+            color: #888; 
+        }
+        .fallback a { 
+            color: #1DB954; 
+            text-decoration: none; 
+            font-weight: 600; 
+            margin-left: 4px;
+        }
+        .fallback a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="loader"></div>
+        <h2>One moment...</h2>
+        <p>Redirecting you to Spotify to unpack your stats!</p>
+        <div class="fallback">
+            Stuck? <a href="{{ auth_url }}">Click here</a>
+        </div>
+    </div>
+</body>
+</html>
